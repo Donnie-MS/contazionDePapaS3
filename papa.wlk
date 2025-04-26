@@ -2,6 +2,7 @@
 object papa {
     var cantidadCosechadaActual = 0
     var calidadActual = buena
+    var impuestoActual = simple
     method calidad() {
         return calidadActual
     }
@@ -18,10 +19,13 @@ object papa {
         return self.costoDeProduccion() + self.impuesto() + self.derechos()
     }
     method impuesto() {
-        return impuestos.simple(self) + impuestos.garantia(self) 
+        return impuestoActual.cotizacion(self)
+    }
+    method cambiarImpuesto(impuesto) {
+        impuestoActual = impuesto
     }
     method costoDeProduccion() {
-        return self.calidad() + self.cantidadDeCosecha()
+        return self.calidad().precioUnitario() * self.cantidadDeCosecha()
     }
     method derechos() {
         return derechosDeExportacion.Demagogico()
@@ -52,29 +56,49 @@ object derechosDeExportacion {
         return 0
     }
 }
-object impuestos {
-    method simple(unProducto) {
+//impuestos
+
+object simple {
+    method cotizacion(unProducto) {
         return unProducto.costoDeProduccion() * 0.10
     }
-    method garantia(unProducto) {
+}
+object garantia {
+    method cotizacion(unProducto) {
         return (unProducto.costoDeProduccion() * 0.05).max(100)
     }
-    method inventada(unProducto) {
+}
+object inventada {
+    method cotizacion(unProducto) {
+        return 0
+    }
+}
 
+//Pepe
+object pepe {
+    var pepeActual = 0
+    method importe() = pepeActual
+    method actualizarPepe(numero) {
+        pepeActual = numero
     }
 }
 //Calidades
 object buena {
-
+    method precioUnitario() {
+        return 3
+    }
 }
 object regular {
-
+    method precioUnitario() {
+        return pepe.importe()
+    }
 }
 object premium {
-
+    method precioUnitario() = buena.precioUnitario() * 1.5
 }
 object batata {
     var costoDeProduccionActual = 10
+    var impuestoActual = simple
     method cambiarCostoDeProduccion(nuevoCosto) {
         costoDeProduccionActual = nuevoCosto
     }
@@ -85,7 +109,10 @@ object batata {
         return self.costoDeProduccion()
     }
     method impuesto() {
-        return impuestos.simple(self) + impuestos.garantia(self)
+        return impuestoActual.cotizacion(self)
+    }
+    method cambiarImpuesto(impuesto) {
+        impuestoActual = impuesto
     }
 }
 
@@ -98,6 +125,6 @@ object zapallo {
         return cantidadCosechadaActual
     }
     method costoDeProduccion() {
-        return cantidadCosechada + cotizacionDePepe + (derechosDeExportacion() / 2) 
+        return self.cantidadCosechada() + pepe.importe() + (derechosDeExportacion() / 2) 
     }
 }
